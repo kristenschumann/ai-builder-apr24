@@ -1,0 +1,8 @@
+{
+  "name": "ai-builder-dashboard",
+  "version": "1.0.0",
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "vercel": "^39.0.0"
+  }
+}

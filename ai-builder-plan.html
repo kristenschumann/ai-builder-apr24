@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Builder Automation Portfolio — Kristen Hansen</title>
+<style>
+  :root {
+    --bg: #000000;
+    --bg-card: #000000;
+    --accent: #A5E446;
+    --accent-hover: #95D03E;
+    --accent-dim: rgba(165, 228, 70, 0.10);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.60);
+    --text-tertiary: #808080;
+    --text-muted: rgba(255, 255, 255, 0.15);
+    --border: #484848;
+    --font-body: "Calibre", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-heading: "Calibre", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-meta: "Departure Mono", "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ─── HEADER ─────────────────────────────── */
+  .header {
+    padding: 72px 0 64px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-eyebrow {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.05;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .header-goal {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .header-meta {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  /* ─── SECTION CHROME ─────────────────────── */
+  section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 40px;
+  }
+
+  /* ─── TIME SUMMARY ───────────────────────── */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .finding-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 24px;
+  }
+
+  .finding-num {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .finding-headline {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .finding-body {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .audit-link {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(165,228,70,0.3);
+    padding-bottom: 1px;
+    transition: border-color 0.15s;
+  }
+
+  .audit-link:hover { border-color: var(--accent); }
+
+  /* ─── AUTOMATION CARDS ───────────────────── */
+  .auto-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 16px;
+  }
+
+  .auto-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .auto-rank {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .auto-outcome {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    max-width: 560px;
+  }
+
+  .auto-badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .badge-hours {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(165,228,70,0.25);
+  }
+
+  .badge-quick {
+    background: rgba(255,255,255,0.06);
+    color: var(--accent);
+    border: 1px solid rgba(165,228,70,0.3);
+  }
+
+  .badge-medium {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .badge-big {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-tertiary);
+    border: 1px solid var(--border);
+  }
+
+  .badge-status {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    color: var(--text-tertiary);
+  }
+
+  .auto-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .auto-col-label {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .auto-col-body {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ─── SPRINT CARDS ───────────────────────── */
+  .sprints-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .sprint-card {
+    background: var(--bg-card);
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 28px 24px;
+    opacity: 0.45;
+  }
+
+  .sprint-label {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+  }
+
+  .sprint-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .sprint-coming {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  /* ─── FOOTER ─────────────────────────────── */
+  .footer {
+    padding: 32px 0;
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    text-align: center;
+  }
+
+  @media (max-width: 720px) {
+    .findings-grid { grid-template-columns: 1fr; }
+    .auto-body { grid-template-columns: 1fr; }
+    .sprints-grid { grid-template-columns: 1fr; }
+    .auto-card-top { flex-direction: column; }
+    .auto-badges { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+    .header h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ─── HEADER ─────────────────────────────── -->
+  <div class="header">
+    <div class="header-eyebrow">AI Builder Automation Portfolio — Sprint 1</div>
+    <h1>Kristen <span>Hansen</span></h1>
+    <div class="header-goal">Goal: Scale AI Builder to $209k/month revenue run rate for 2 straight months.</div>
+    <div class="header-meta">April 20, 2026 &nbsp;·&nbsp; Level 2</div>
+  </div>
+
+  <!-- ─── TIME SUMMARY ──────────────────────── -->
+  <section>
+    <div class="section-label">Sprint 1 — Time audit</div>
+    <div class="section-title">What I learned about my time</div>
+
+    <div class="findings-grid">
+      <div class="finding-card">
+        <div class="finding-num">Finding 01</div>
+        <div class="finding-headline">I'm answering the same 5 questions manually — and it doesn't scale.</div>
+        <div class="finding-body">The same student questions (recordings, missed sessions, cohort switches) land in my inbox 5–10 times per week. One student got 4 separate replies to the same request. With 30 new students joining in a single week, this breaks at volume.</div>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 02</div>
+        <div class="finding-headline">LinkedIn is my #1 browser domain — more visits than Gmail and Claude combined.</div>
+        <div class="finding-body">749 visits during work hours, ~68 per day. No publishing schedule in the data. That means most of it is reactive browsing, not intentional distribution — a significant drag on focused build time.</div>
+      </div>
+      <div class="finding-card">
+        <div class="finding-num">Finding 03</div>
+        <div class="finding-headline">The onboarding email sequence is the root cause of my support load.</div>
+        <div class="finding-body">Students receive 5 overlapping automated emails at enrollment — flagged by a student directly. The confusion generates the schedule questions, cohort-switch requests, and "which email is right?" threads I field all week. Fixing it is a root-cause fix, not a patch.</div>
+      </div>
+    </div>
+
+    <a href="time-audit.html" class="audit-link">Full Time Audit &rarr;</a>
+  </section>
+
+  <!-- ─── WHAT I'M BUILDING ─────────────────── -->
+  <section>
+    <div class="section-label">Sprint 1 deliverable</div>
+    <div class="section-title">What I'm building</div>
+
+    <!-- #1 -->
+    <div class="auto-card">
+      <div class="auto-card-top">
+        <div>
+          <div class="auto-rank">#1 &nbsp;·&nbsp; Highest impact</div>
+          <div class="auto-outcome">Student support questions answer themselves.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="badge badge-hours">~3h / week reclaimed</span>
+          <span class="badge badge-medium">Medium lift</span>
+          <span class="badge badge-status">Not started</span>
+        </div>
+      </div>
+      <div class="auto-body">
+        <div>
+          <div class="auto-col-label">What's happening today</div>
+          <div class="auto-col-body">The same 5 questions — "Where is the recording?", "Can I switch cohorts?", "I missed a session", "What are the Zoom links?", "How do I access pre-work?" — are answered manually 5–10 times per week across email and Slack. The answers never change.</div>
+        </div>
+        <div>
+          <div class="auto-col-label">What the automated version looks like</div>
+          <div class="auto-col-body">A Claude-powered FAQ agent watches the AI Builder Slack workspace and replies instantly when a student asks a known question. Gmail filter + HubSpot workflow routes FAQ-subject emails to pre-written responses. Edge cases escalate via DM. Kristen removed from first-line triage entirely.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- #2 -->
+    <div class="auto-card">
+      <div class="auto-card-top">
+        <div>
+          <div class="auto-rank">#2 &nbsp;·&nbsp; High impact</div>
+          <div class="auto-outcome">Onboarding emails stop confusing students before Session 1.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="badge badge-hours">~1.5h / week reclaimed</span>
+          <span class="badge badge-quick">Quick win</span>
+          <span class="badge badge-status">Not started</span>
+        </div>
+      </div>
+      <div class="auto-body">
+        <div>
+          <div class="auto-col-label">What's happening today</div>
+          <div class="auto-col-body">Students receive 5 overlapping automated emails at enrollment. The confusion drives schedule questions, cohort-switch requests, and "which email is right?" threads — all of which land in Kristen's inbox. A student flagged this directly.</div>
+        </div>
+        <div>
+          <div class="auto-col-label">What the automated version looks like</div>
+          <div class="auto-col-body">Audit the HubSpot enrollment workflow with Macy/Ellie. Consolidate 5 emails into 2: (1) welcome + what to do now, (2) day-before reminder with Zoom link. Each email has exactly one job. Students arrive informed. Cohort-switch requests drop significantly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- #3 -->
+    <div class="auto-card">
+      <div class="auto-card-top">
+        <div>
+          <div class="auto-rank">#3 &nbsp;·&nbsp; High impact</div>
+          <div class="auto-outcome">LinkedIn presence runs on a publishing schedule — not daily browsing.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="badge badge-hours">~2h / week reclaimed</span>
+          <span class="badge badge-big">Big build</span>
+          <span class="badge badge-status">Not started</span>
+        </div>
+      </div>
+      <div class="auto-body">
+        <div>
+          <div class="auto-col-label">What's happening today</div>
+          <div class="auto-col-body">LinkedIn is the #1 most-visited domain at 749 work-hours visits — beating Gmail and Claude combined. ~68 visits per day with no publishing schedule visible in the data. Most of it is reactive browsing, not intentional distribution.</div>
+        </div>
+        <div>
+          <div class="auto-col-label">What the automated version looks like</div>
+          <div class="auto-col-body">A weekly 30-minute batch session with Claude generates 3–5 LinkedIn posts from actual AI Builder work: student wins, session highlights, lessons learned. Posts scheduled for the week. LinkedIn becomes publish-and-exit. Target: cut daily visits from 68 to under 15.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- #4 -->
+    <div class="auto-card">
+      <div class="auto-card-top">
+        <div>
+          <div class="auto-rank">#4 &nbsp;·&nbsp; Medium impact</div>
+          <div class="auto-outcome">Cohort switching happens without my involvement.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="badge badge-hours">~1h / week reclaimed</span>
+          <span class="badge badge-medium">Medium lift</span>
+          <span class="badge badge-status">Not started</span>
+        </div>
+      </div>
+      <div class="auto-body">
+        <div>
+          <div class="auto-col-label">What's happening today</div>
+          <div class="auto-col-body">Students who can't attend their enrolled cohort email Kristen to request a switch. She manually reviews, approves, and replies — sometimes 3–4 times to the same student. 5+ instances in the last 2 weeks. Fully delegatable or automatable.</div>
+        </div>
+        <div>
+          <div class="auto-col-label">What the automated version looks like</div>
+          <div class="auto-col-body">A self-serve form lets students select a new cohort date. Submission triggers a HubSpot workflow: updates enrollment, sends a confirmation, notifies ops. Kristen gets a weekly Slack digest of all switches — not individual emails. Fully removed from the loop.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- #5 -->
+    <div class="auto-card">
+      <div class="auto-card-top">
+        <div>
+          <div class="auto-rank">#5 &nbsp;·&nbsp; Medium impact</div>
+          <div class="auto-outcome">Recording links reach students automatically within 30 minutes of each session.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="badge badge-hours">~1h / week reclaimed</span>
+          <span class="badge badge-medium">Medium lift</span>
+          <span class="badge badge-status">Not started</span>
+        </div>
+      </div>
+      <div class="auto-body">
+        <div>
+          <div class="auto-col-label">What's happening today</div>
+          <div class="auto-col-body">After each session, Zoom sends a recording-ready email. Someone — often Kristen — manually distributes the link via Slack or email. "Where is the recording?" is the #1 student support question, meaning distribution is delayed or inconsistent.</div>
+        </div>
+        <div>
+          <div class="auto-col-label">What the automated version looks like</div>
+          <div class="auto-col-body">An n8n workflow watches for Zoom recording emails. When triggered, it extracts the recording URL and posts to the correct cohort Slack channel. Optionally sends a HubSpot email to enrolled students. Recording in Slack within 30 minutes of session end. Zero manual steps.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- #6 -->
+    <div class="auto-card">
+      <div class="auto-card-top">
+        <div>
+          <div class="auto-rank">#6 &nbsp;·&nbsp; Lower impact</div>
+          <div class="auto-outcome">Weekly update to Nick writes itself in 2 minutes.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="badge badge-hours">~0.5h / week reclaimed</span>
+          <span class="badge badge-quick">Quick win</span>
+          <span class="badge badge-status">Not started</span>
+        </div>
+      </div>
+      <div class="auto-body">
+        <div>
+          <div class="auto-col-label">What's happening today</div>
+          <div class="auto-col-body">A weekly summary email to Nick is drafted manually by pulling from Notion, calendar, and memory. Each draft takes 20–40 minutes. The format is consistent week to week: this week / blockers / next week.</div>
+        </div>
+        <div>
+          <div class="auto-col-label">What the automated version looks like</div>
+          <div class="auto-col-body">A Claude Code skill pulls this week's calendar events, Notion course status, and flagged blockers. Drafts a Nick-style weekly update in Kristen's voice. Review and send in under 2 minutes. Trigger: Thursday 3pm.</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ─── MY SYSTEM ─────────────────────────── -->
+  <section>
+    <div class="section-label">Sprints 2–6</div>
+    <div class="section-title">My system</div>
+
+    <div class="sprints-grid">
+
+      <div class="sprint-card">
+        <div class="sprint-label">Sprint 2</div>
+        <div class="sprint-title">Deployed website + data collection tool</div>
+        <div class="sprint-coming">Coming in Sprint 2</div>
+      </div>
+
+      <div class="sprint-card">
+        <div class="sprint-label">Sprint 3</div>
+        <div class="sprint-title">Automated n8n or Claude Routines workflow</div>
+        <div class="sprint-coming">Coming in Sprint 3</div>
+      </div>
+
+      <div class="sprint-card">
+        <div class="sprint-label">Sprint 4</div>
+        <div class="sprint-title">Knowledge wiki context system</div>
+        <div class="sprint-coming">Coming in Sprint 4</div>
+      </div>
+
+      <div class="sprint-card">
+        <div class="sprint-label">Sprint 5</div>
+        <div class="sprint-title">Custom agentic workflow</div>
+        <div class="sprint-coming">Coming in Sprint 5</div>
+      </div>
+
+      <div class="sprint-card" style="grid-column: 1 / -1; max-width: calc(50% - 8px);">
+        <div class="sprint-label">Sprint 6</div>
+        <div class="sprint-title">Eval system — tested and documented</div>
+        <div class="sprint-coming">Coming in Sprint 6</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─────────────────────────────── -->
+  <div class="footer">
+    AI Builder Automation Portfolio &nbsp;·&nbsp; April 20, 2026 &nbsp;·&nbsp; Built in L2
+  </div>
+
+</div>
+</body>
+</html>

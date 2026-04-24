@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Builder Automation Roadmap</title>
+<style>
+  :root {
+    --bg: #000000;
+    --accent: #A5E446;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.60);
+    --text-tertiary: #808080;
+    --text-muted: rgba(255,255,255,0.15);
+    --border: #2a2a2a;
+    --border-strong: #484848;
+    --font-body: "Calibre", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-meta: "Departure Mono", "SF Mono", "Fira Code", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 56px 48px 48px;
+    border-bottom: 1px solid var(--border-strong);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  .header-eyebrow {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header-sub { font-size: 15px; color: var(--text-secondary); max-width: 540px; }
+  .header-meta {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+
+  /* BOARD */
+  .board-wrap { padding: 40px 48px 72px; overflow-x: auto; }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(240px, 1fr));
+    gap: 16px;
+    min-width: 860px;
+  }
+
+  /* COLUMN */
+  .column {
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    min-height: 460px;
+  }
+  .col-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .col-title {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .col-count {
+    font-family: var(--font-meta);
+    font-size: 11px;
+    color: var(--text-tertiary);
+    background: var(--text-muted);
+    border-radius: 20px;
+    padding: 1px 8px;
+  }
+
+  /* Column variants */
+  .col-suggested { border-color: #1a1a1a; background: #0d0d0d; opacity: 0.65; }
+  .col-suggested .col-title { color: #444; }
+  .col-suggested .col-header { border-color: #1a1a1a; }
+
+  .col-to-build .col-title { color: var(--text-secondary); }
+
+  .col-in-progress .col-header { background: rgba(165,228,70,0.06); }
+  .col-in-progress .col-title { color: var(--accent); }
+
+  .col-done .col-title { color: var(--text-tertiary); }
+  .col-done .cards { opacity: 0.5; }
+
+  /* DROP ZONE */
+  .cards {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 60px;
+  }
+  .cards.drag-over { background: rgba(165,228,70,0.04); border-radius: 0 0 10px 10px; }
+
+  .empty-hint {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 24px 0;
+    pointer-events: none;
+  }
+
+  /* CARD */
+  .card {
+    background: #161616;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 14px 12px;
+    cursor: grab;
+    user-select: none;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--border-strong); }
+  .card.dragging { opacity: 0.3; }
+  .card.drag-placeholder {
+    border: 1px dashed #333;
+    background: transparent;
+    height: 80px;
+    border-radius: 8px;
+  }
+
+  .card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .priority {
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+  .p-high   { color: #A5E446; background: rgba(165,228,70,0.12); }
+  .p-medium { color: #e4b546; background: rgba(228,181,70,0.12); }
+  .p-low    { color: var(--text-tertiary); background: var(--text-muted); }
+  .drag-handle { color: var(--text-muted); font-size: 13px; }
+
+  /* Suggested column card tones */
+  .col-suggested .card { background: #0f0f0f; border-color: #1e1e1e; }
+  .col-suggested .card-name { color: #444; }
+  .col-suggested .card-desc { color: #333; }
+
+  /* FOOTER */
+  .footer {
+    padding: 20px 48px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-meta);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  .btn-reset {
+    background: none; border: none; padding: 0; cursor: pointer;
+    font-family: var(--font-meta); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-tertiary);
+  }
+  .btn-reset:hover { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-eyebrow">AI Builder — Sprint 1</div>
+    <h1>Automation <span>Roadmap</span></h1>
+    <div class="header-sub">Drag cards to update status. Changes persist in your browser.</div>
+  </div>
+  <div class="header-meta">Kristen Hansen &nbsp;&middot;&nbsp; April 2026</div>
+</div>
+
+<div class="board-wrap">
+  <div class="board">
+
+    <!-- SUGGESTED -->
+    <div class="column col-suggested" id="col-suggested">
+      <div class="col-header">
+        <span class="col-title">Suggested</span>
+        <span class="col-count" id="cnt-suggested">0</span>
+      </div>
+      <div class="cards" id="zone-suggested">
+        <div class="empty-hint">Ideas from others</div>
+      </div>
+    </div>
+
+    <!-- TO BUILD -->
+    <div class="column col-to-build" id="col-to-build">
+      <div class="col-header">
+        <span class="col-title">To Build</span>
+        <span class="col-count" id="cnt-to-build">0</span>
+      </div>
+      <div class="cards" id="zone-to-build">
+        <div class="empty-hint">Loading...</div>
+      </div>
+    </div>
+
+    <!-- IN PROGRESS -->
+    <div class="column col-in-progress" id="col-in-progress">
+      <div class="col-header">
+        <span class="col-title">In Progress</span>
+        <span class="col-count" id="cnt-in-progress">0</span>
+      </div>
+      <div class="cards" id="zone-in-progress">
+        <div class="empty-hint">Nothing active yet</div>
+      </div>
+    </div>
+
+    <!-- DONE -->
+    <div class="column col-done" id="col-done">
+      <div class="col-header">
+        <span class="col-title">Done</span>
+        <span class="col-count" id="cnt-done">0</span>
+      </div>
+      <div class="cards" id="zone-done">
+        <div class="empty-hint">Ship something</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  <span>Drag to move &nbsp;&middot;&nbsp; Synced with Notion</span>
+  <button class="btn-reset" onclick="location.reload()">Refresh</button>
+</div>
+
+<script>
+var COLS = ["suggested", "to-build", "in-progress", "done"];
+var dragging = null;
+var placeholder = null;
+
+var STATUS_MAP = {
+  "suggested":  "Suggested",
+  "to-build":   "To Build",
+  "in-progress":"In Progress",
+  "done":       "Done"
+};
+
+var COL_MAP = {
+  "Suggested":   "suggested",
+  "To Build":    "to-build",
+  "In Progress": "in-progress",
+  "Done":        "done"
+};
+
+var PRIORITY_CLASS = { "High": "p-high", "Medium": "p-medium", "Low": "p-low" };
+
+function makeCard(row) {
+  var card = document.createElement("div");
+  card.className = "card";
+  card.draggable = true;
+  card.setAttribute("data-id", row.id);
+  card.setAttribute("data-notion-id", row.id);
+
+  var nm = document.createElement("div");
+  nm.className = "card-name";
+  nm.textContent = row.name;
+
+  var ds = document.createElement("div");
+  ds.className = "card-desc";
+  ds.textContent = row.description;
+
+  var ft = document.createElement("div");
+  ft.className = "card-footer";
+
+  var badge = document.createElement("span");
+  badge.className = "priority " + (PRIORITY_CLASS[row.priority] || "p-low");
+  badge.textContent = row.priority;
+
+  var handle = document.createElement("span");
+  handle.className = "drag-handle";
+  handle.textContent = ":::";
+
+  ft.appendChild(badge);
+  ft.appendChild(handle);
+  card.appendChild(nm);
+  card.appendChild(ds);
+  card.appendChild(ft);
+  return card;
+}
+
+function updateCounts() {
+  for (var i = 0; i < COLS.length; i++) {
+    var zone = document.getElementById("zone-" + COLS[i]);
+    var cnt  = document.getElementById("cnt-"  + COLS[i]);
+    if (!zone || !cnt) continue;
+    var cards = zone.querySelectorAll(".card:not(.drag-placeholder)");
+    cnt.textContent = cards.length;
+    var hint = zone.querySelector(".empty-hint");
+    if (hint) hint.style.display = cards.length === 0 ? "flex" : "none";
+  }
+}
+
+function loadCards() {
+  fetch("/api/roadmap")
+    .then(function(r) { return r.json(); })
+    .then(function(rows) {
+      // Clear all zones
+      for (var i = 0; i < COLS.length; i++) {
+        var zone = document.getElementById("zone-" + COLS[i]);
+        var hints = zone.querySelectorAll(".empty-hint");
+        var cards = zone.querySelectorAll(".card");
+        for (var c = 0; c < cards.length; c++) cards[c].parentNode.removeChild(cards[c]);
+      }
+      // Place each card
+      rows.forEach(function(row) {
+        var col = COL_MAP[row.status] || "to-build";
+        var zone = document.getElementById("zone-" + col);
+        if (zone) zone.appendChild(makeCard(row));
+      });
+      updateCounts();
+      initDrag();
+    })
+    .catch(function(err) {
+      console.error("Failed to load roadmap:", err);
+      document.getElementById("zone-to-build").querySelector(".empty-hint").textContent = "Failed to load — check /api/roadmap";
+    });
+}
+
+function patchCard(notionId, newStatus) {
+  fetch("/api/roadmap", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: notionId, status: newStatus })
+  }).catch(function(err) { console.error("PATCH failed:", err); });
+}
+
+function initDrag() {
+  var cards = document.querySelectorAll(".card");
+  for (var i = 0; i < cards.length; i++) {
+    cards[i].addEventListener("dragstart", onDragStart);
+    cards[i].addEventListener("dragend", onDragEnd);
+  }
+  var zones = document.querySelectorAll(".cards");
+  for (var j = 0; j < zones.length; j++) {
+    zones[j].addEventListener("dragover", onDragOver);
+    zones[j].addEventListener("dragleave", onDragLeave);
+    zones[j].addEventListener("drop", onDrop);
+  }
+}
+
+function onDragStart(e) {
+  dragging = e.currentTarget;
+  dragging.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  placeholder = document.createElement("div");
+  placeholder.className = "card drag-placeholder";
+}
+
+function onDragEnd() {
+  if (dragging) dragging.classList.remove("dragging");
+  if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+  var zones = document.querySelectorAll(".cards");
+  for (var i = 0; i < zones.length; i++) zones[i].classList.remove("drag-over");
+
+  if (dragging) {
+    var zone = dragging.parentElement;
+    if (zone && zone.id) {
+      var col = zone.id.replace("zone-", "");
+      var notionStatus = STATUS_MAP[col];
+      var notionId = dragging.getAttribute("data-notion-id");
+      if (notionId && notionStatus) patchCard(notionId, notionStatus);
+    }
+  }
+
+  dragging = null;
+  placeholder = null;
+  updateCounts();
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  var zone = e.currentTarget;
+  zone.classList.add("drag-over");
+  if (placeholder && zone !== placeholder.parentNode) zone.appendChild(placeholder);
+}
+
+function onDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove("drag-over");
+  }
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  var zone = e.currentTarget;
+  zone.classList.remove("drag-over");
+  if (dragging && zone) {
+    if (placeholder && placeholder.parentNode === zone) {
+      zone.insertBefore(dragging, placeholder);
+    } else {
+      zone.appendChild(dragging);
+    }
+  }
+}
+
+loadCards();
+</script>
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Audit — Kristen Hansen</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --text: #e2e8f0;
+    --muted: #8892b0;
+    --accent: #7c6af7;
+    --accent2: #4fc3f7;
+    --green: #43d98c;
+    --yellow: #f7c948;
+    --red: #f47067;
+    --orange: #f4a261;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-size: 15px; line-height: 1.6; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 48px 32px; }
+
+  .header { border-bottom: 1px solid var(--border); padding-bottom: 32px; margin-bottom: 48px; }
+  .header-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .header h1 { font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .header-goal { font-size: 16px; color: var(--muted); margin-bottom: 12px; }
+  .header-goal strong { color: var(--accent2); }
+  .header-meta { font-size: 13px; color: var(--muted); }
+
+  .section { margin-bottom: 56px; }
+  .section-title { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .section-subtitle { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .stat-value { font-size: 32px; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .stat-red .stat-value { color: var(--red); }
+  .stat-yellow .stat-value { color: var(--yellow); }
+  .stat-green .stat-value { color: var(--green); }
+
+  .app-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .app-row:last-child { border-bottom: none; }
+  .app-name { width: 160px; font-size: 14px; font-weight: 500; flex-shrink: 0; }
+  .app-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 8px; }
+  .app-bar { height: 8px; border-radius: 4px; background: var(--accent); }
+  .app-hours { width: 52px; text-align: right; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  .app-note { font-size: 12px; color: var(--muted); flex-shrink: 0; width: 180px; }
+
+  .cat-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-label { width: 160px; font-size: 14px; font-weight: 500; flex-shrink: 0; }
+  .cat-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 8px; }
+  .cat-bar { height: 8px; border-radius: 4px; }
+  .cat-pct { width: 48px; text-align: right; font-size: 13px; color: var(--muted); }
+
+  .meeting-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .meeting-row:last-child { border-bottom: none; }
+  .meeting-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; white-space: nowrap; }
+  .badge-1on1 { background: rgba(76,195,247,0.15); color: var(--accent2); }
+  .badge-team { background: rgba(124,106,247,0.15); color: var(--accent); }
+  .badge-external { background: rgba(67,217,140,0.15); color: var(--green); }
+  .badge-focus { background: rgba(247,201,72,0.15); color: var(--yellow); }
+  .meeting-name { font-size: 14px; }
+  .meeting-count { font-size: 12px; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+
+  .diag { background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 12px; }
+  .diag.red { border-color: var(--red); }
+  .diag.yellow { border-color: var(--yellow); }
+  .diag.green { border-color: var(--green); }
+  .diag-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .diag-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .obs-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 14px; }
+  .obs-num { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .obs-text { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .obs-data { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .goal-row { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 12px; }
+  .goal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .goal-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .goal-name { font-size: 15px; font-weight: 600; }
+  .goal-body { font-size: 13px; color: var(--muted); line-height: 1.6; padding-left: 22px; }
+
+  .auto-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 18px; }
+  .auto-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  .auto-rank { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .auto-outcome { font-size: 17px; font-weight: 700; color: var(--text); margin: 4px 0 0; }
+  .auto-badges { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .effort-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+  .effort-quick { background: rgba(67,217,140,0.15); color: var(--green); }
+  .effort-medium { background: rgba(247,201,72,0.15); color: var(--yellow); }
+  .effort-big { background: rgba(244,112,103,0.15); color: var(--red); }
+  .hours-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; background: rgba(124,106,247,0.15); color: var(--accent); }
+  .auto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .auto-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+  .auto-section-body { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+  .sources-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .sources-table th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .sources-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .sources-table tr:last-child td { border-bottom: none; }
+  .source-ok { color: var(--green); font-weight: 600; }
+
+  .footer { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 64px; font-size: 12px; color: var(--muted); text-align: center; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; margin-left: 8px; vertical-align: middle; }
+  .tag-draft { background: rgba(247,201,72,0.15); color: var(--yellow); }
+
+  .flag-red { color: var(--red); font-weight: 600; }
+  .flag-yellow { color: var(--yellow); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-label">AI Builder Automation Portfolio — Time Audit</div>
+    <h1>Kristen Hansen</h1>
+    <div class="header-goal">Top goal: <strong>Scale AI Builder to $209k/month revenue run rate for 2 straight months</strong></div>
+    <div class="header-meta">Analysis period: Apr 6–20, 2026 (11 weekdays app data · 14 weekdays calendar · 30 days email) &nbsp;·&nbsp; Generated April 20, 2026</div>
+  </div>
+
+  <!-- SECTION 1: HOW I SPEND MY TIME -->
+  <div class="section">
+    <div class="section-title">How I Actually Spend My Time</div>
+
+    <div class="section-subtitle">App Usage — Top 10 (Work Hours, 8am–6:30pm Weekdays)</div>
+    <div class="card">
+      <div class="app-row">
+        <div class="app-name">Notion</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:100%; background:#7c6af7;"></div></div>
+        <div class="app-hours">26.1h</div>
+        <div class="app-note">Course content, status, planning</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Chrome</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:98.5%; background:#4fc3f7;"></div></div>
+        <div class="app-hours">25.7h</div>
+        <div class="app-note">Everything (see browser breakdown)</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Claude Desktop</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:55.6%; background:#d97c4f;"></div></div>
+        <div class="app-hours">14.5h</div>
+        <div class="app-note">Primary AI work environment</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Slack</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:41.0%; background:#43d98c;"></div></div>
+        <div class="app-hours">10.7h</div>
+        <div class="app-note">Team + AI Builder cohort comms</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Zoom</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:15.0%;"></div></div>
+        <div class="app-hours">3.9h</div>
+        <div class="app-note">Meetings, dry runs, delivery</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Ghostty (Terminal)</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:12.6%;"></div></div>
+        <div class="app-hours">3.3h</div>
+        <div class="app-note">Claude Code CLI sessions</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Electron (VSCode)</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:5.4%;"></div></div>
+        <div class="app-hours">1.4h</div>
+        <div class="app-note">Code review / HTML editing</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Granola</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:2.0%;"></div></div>
+        <div class="app-hours">0.5h</div>
+        <div class="app-note">Meeting notes, transcripts</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Finder</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:2.0%;"></div></div>
+        <div class="app-hours">0.5h</div>
+        <div class="app-note">File management</div>
+      </div>
+      <div class="app-row">
+        <div class="app-name">Wispr Flow</div>
+        <div class="app-bar-wrap"><div class="app-bar" style="width:0.4%;"></div></div>
+        <div class="app-hours">&lt;0.1h</div>
+        <div class="app-note">Dictation (25 fast-burst sessions)</div>
+      </div>
+    </div>
+
+    <div class="section-subtitle" style="margin-top:32px;">Browser — 7,085 Work-Hours Visits by Category</div>
+    <div class="card">
+      <div class="cat-row">
+        <div class="cat-label"><span class="flag-red">Social Media</span></div>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:13.5%; background:var(--red);"></div></div>
+        <div class="cat-pct">13.5%</div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-label">Docs &amp; Research</div>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:13.6%; background:var(--accent);"></div></div>
+        <div class="cat-pct">13.6%</div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-label">CRM &amp; Ops</div>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:12.5%; background:var(--accent2);"></div></div>
+        <div class="cat-pct">12.5%</div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-label">Comms (Gmail/Cal)</div>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:11.1%; background:var(--green);"></div></div>
+        <div class="cat-pct">11.1%</div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-label">AI Tools</div>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:7.7%; background:#d97c4f;"></div></div>
+        <div class="cat-pct">7.7%</div>
+      </div>
+      <div class="cat-row">
+        <div class="cat-label">Other / Unknown</div>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:41.5%; background:var(--border);"></div></div>
+        <div class="cat-pct">41.5%</div>
+      </div>
+    </div>
+    <div style="font-size:13px; color:var(--muted); margin-top:8px; margin-bottom:24px; line-height:1.8;">
+      Top domains: <span class="flag-red">linkedin.com (749)</span>, claude.ai (512), mail.notion.so (489), app.hubspot.com (417), lelandcourses.com (397), mail.google.com (365), admin.typeform.com (276), calendar.google.com (266), github.com (222), <span class="flag-red">x.com (201)</span>, coach.joinleland.com (182), dbc-databricks (132), doordash.com (91 — during work hours)
+    </div>
+
+    <div class="section-subtitle">Meetings — 14 Weekdays (Apr 1–20)</div>
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="stat-card stat-yellow">
+        <div class="stat-value">~4h</div>
+        <div class="stat-label">Avg structured meetings/day</div>
+        <div class="stat-sub">Excl. all-day blocks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent);">13×</div>
+        <div class="stat-label">Daily standup</div>
+        <div class="stat-sub">Most frequent recurring meeting</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-value">53</div>
+        <div class="stat-label">Back-to-back instances</div>
+        <div class="stat-sub">~3.8/day — zero buffer</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-value">7×</div>
+        <div class="stat-label">BUILD blocks protected</div>
+        <div class="stat-sub">Apr 10 was lightest day (3.2h)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recurring Meetings (2+ times)</div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-team">Team</span>
+        <div class="meeting-name">AI Builder Delivery Standup</div>
+        <div class="meeting-count">13× — daily at 9am</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-focus">Focus</span>
+        <div class="meeting-name">BUILD block</div>
+        <div class="meeting-count">7× — protected build time</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-focus">Focus</span>
+        <div class="meeting-name">L1 Debrief Hold</div>
+        <div class="meeting-count">4× — post-session buffer</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-external">External</span>
+        <div class="meeting-name">AI Builder Program — Internal Trial (L1 + L2)</div>
+        <div class="meeting-count">3× each — live cohort delivery</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-external">External</span>
+        <div class="meeting-name">AI Builder Program L1: Office Hours</div>
+        <div class="meeting-count">3×</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-team">Team</span>
+        <div class="meeting-name">Check-in Meeting w/ Kristen (team 1:1s)</div>
+        <div class="meeting-count">3×</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-1on1">1:1</span>
+        <div class="meeting-name">Kristen / Nick 1:1</div>
+        <div class="meeting-count">3× + weekly update email</div>
+      </div>
+      <div class="meeting-row">
+        <span class="meeting-badge badge-focus">Focus</span>
+        <div class="meeting-name">Plan &amp; Prioritize Week</div>
+        <div class="meeting-count">2× — Monday ritual</div>
+      </div>
+    </div>
+
+    <div class="section-subtitle" style="margin-top:32px;">Email &amp; Slack Patterns (Last 30 days)</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">What I Send Repeatedly</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.9;">
+          <div>"Recording will be emailed within 24h" — sent 6+ times to different students</div>
+          <div>"Moving you to the [date] cohort" — sent 5+ times (one student got 4 versions)</div>
+          <div>Schedule change explanations to confused enrollees</div>
+          <div>GRE coach coordination (Matt, Bruce — ongoing for weeks)</div>
+          <div>Weekly update to Nick (Thursdays/Fridays)</div>
+          <div>HubSpot test send → forward to Macy/Ellie for review</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">What Lands in My Inbox</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.9;">
+          <div>Student questions: recordings, missed sessions, schedule conflicts</div>
+          <div>GitHub/Cloudflare deploy notifications (every PR merge)</div>
+          <div>Zoom recording-ready emails (every session)</div>
+          <div>Leland platform coaching session bookings</div>
+          <div>Event logistics from Janae (action-required ops)</div>
+          <div>AI newsletters — Every, DataTalks, YourEverydayAI — daily</div>
+          <div>Cold outreach / partnership proposals</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Where I'm the Bottleneck</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.9;">
+          <div>Cohort switches — manual, no delegation or tooling</div>
+          <div>GRE coach video review (Matt waiting weeks for approval)</div>
+          <div>HubSpot email approval before send</div>
+          <div>VC self-study course (Katherine waiting since February)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Slack Activity</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.9;">
+          <div>Answering student questions in #l1-mar30-cohort, #l1-apr21-cohort, #help</div>
+          <div>Fixing Slack access issues individually (Joy Remoroza)</div>
+          <div>Sharing recording links manually after sessions</div>
+          <div>AI news drops in #ai-news</div>
+          <div>30+ new students joined AI Builder Slack Apr 12–18 alone</div>
+          <div>Claude Code docs sync bot posting updates to self-DM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: KEY DIAGNOSTICS -->
+  <div class="section">
+    <div class="section-title">Key Diagnostics</div>
+
+    <div class="grid-4" style="margin-bottom:24px;">
+      <div class="stat-card stat-red">
+        <div class="stat-value">744</div>
+        <div class="stat-label">Avg app switches/day</div>
+        <div class="stat-sub">Worst: Apr 14 at 1,144</div>
+      </div>
+      <div class="stat-card stat-yellow">
+        <div class="stat-value">13.5%</div>
+        <div class="stat-label">Social media (work hours)</div>
+        <div class="stat-sub">LinkedIn 749 + X 201 visits</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-value">53</div>
+        <div class="stat-label">Back-to-back meetings</div>
+        <div class="stat-sub">14 days, ~3.8/day — no buffer</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent2);">17%</div>
+        <div class="stat-label">Time in AI tools</div>
+        <div class="stat-sub">Claude Desktop 14.5h of ~87h tracked</div>
+      </div>
+    </div>
+
+    <div class="diag red">
+      <div class="diag-title">Context switching rate is extreme</div>
+      <div class="diag-body">744 app switches per day on average — nearly one every 30 seconds across an 8-hour day. Worst day (Apr 14) hit 1,144. Slack (1,052 sessions), Claude (1,870 sessions), and Chrome (2,050 sessions) are competing for attention simultaneously. This is the signature of reactive, fragmented work — not deep build time.</div>
+    </div>
+
+    <div class="diag yellow">
+      <div class="diag-title">Meeting load vs. deep work: no clear winner</div>
+      <div class="diag-body">7 protected BUILD blocks over 14 days is good. But 53 back-to-back transitions mean the non-meeting time is also fragmented. The daily standup at 9am is a reasonable anchor, but back-to-back patterns on Apr 3 (5 consecutive meetings) and Apr 6 show the schedule isn't protecting long stretches of focus.</div>
+    </div>
+
+    <div class="diag red">
+      <div class="diag-title">Top 3 time drains</div>
+      <div class="diag-body">
+        <strong style="color:var(--text);">1. Reactive student support</strong> — manually answering the same 5 questions students could self-serve, costing ~30–45 min/day across email and Slack.<br><br>
+        <strong style="color:var(--text);">2. LinkedIn during work hours</strong> — 749 visits = #1 most-visited domain, beating Gmail and primary AI tools. No evidence of a batched publishing workflow, which means most of these visits are reactive browsing.<br><br>
+        <strong style="color:var(--text);">3. Unresolved ops dependencies</strong> — GRE coach video review (Matt waiting weeks), VC course (Katherine waiting since February), cohort switching with no delegation layer.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SHARP OBSERVATIONS -->
+  <div class="section">
+    <div class="section-title">3 Sharp Observations</div>
+
+    <div class="obs-card">
+      <div class="obs-num">Observation 1</div>
+      <div class="obs-text">Notion is matching Chrome hour-for-hour — and that's probably fine, but the session count tells a different story.</div>
+      <div class="obs-data">Notion and Chrome are at 26.1h and 25.7h respectively. But Notion generated 1,504 sessions vs. Chrome's 2,050. That's one Notion context switch every ~10 minutes across 11 days. Deep document work doesn't look like 1,500 sessions. This is status-checking and tab-hopping, not focused content building.</div>
+    </div>
+
+    <div class="obs-card">
+      <div class="obs-num">Observation 2</div>
+      <div class="obs-text">You're running student support for 2 active cohorts with no triage layer — and the volume is growing fast.</div>
+      <div class="obs-data">30 new students joined AI Builder Slack in a single week (Apr 12–18). The same support patterns appear in email, Slack, and calendar (Leland+ feedback calls). One student (Allie) received 4 separate replies to the same cohort-switch request. Without a self-serve FAQ or delegation layer, every new student is a potential path to your inbox.</div>
+    </div>
+
+    <div class="obs-card">
+      <div class="obs-num">Observation 3</div>
+      <div class="obs-text">The onboarding email sequence is actively generating support load — and you already know it.</div>
+      <div class="obs-data">A student flagged that they received "5 automated emails of partially overlapping information upon signing up." You agreed immediately. The confusion from that sequence likely drives a meaningful share of the schedule questions, recording questions, and cohort-switch requests you're fielding. Fixing it is a root-cause fix, not just a nice-to-have.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: GOAL ALIGNMENT -->
+  <div class="section">
+    <div class="section-title">Goal Alignment</div>
+
+    <div class="goal-row">
+      <div class="goal-header">
+        <div class="goal-indicator" style="background:var(--yellow);"></div>
+        <div class="goal-name">Goal 1: $209k/month revenue run rate (2 months sustained)</div>
+      </div>
+      <div class="goal-body">
+        <strong style="color:var(--text);">Time going toward it:</strong> HubSpot (417 visits), coach.joinleland.com (182), Typeform (276), event logistics, landing page kickoff meeting, growth team sync.<br><br>
+        <strong style="color:var(--text);">What's eating time that doesn't move the needle:</strong> Manual cohort switching (fully delegatable), answering identical student support questions, GRE/VC self-study ops that are explicitly on the back burner.<br><br>
+        <strong style="color:var(--text);">Missing from the data:</strong> No visible time on conversion funnel analysis or enrollment pace tracking. LinkedIn is your #1 domain — unclear how much is intentional distribution vs. passive checking.
+      </div>
+    </div>
+
+    <div class="goal-row">
+      <div class="goal-header">
+        <div class="goal-indicator" style="background:var(--green);"></div>
+        <div class="goal-name">Goal 2: Deliver exceptional L1 and L2 cohorts</div>
+      </div>
+      <div class="goal-body">
+        <strong style="color:var(--text);">Time going toward it:</strong> This is clearly the primary focus. Delivery Standup (13×), dry runs (today: L1S1 + L2S1), BUILD blocks (7×), debrief holds (4×), office hours (3×), and most of the Notion/Claude time. 14.5h in Claude Desktop is largely curriculum and slide production.<br><br>
+        <strong style="color:var(--text);">What's eating time that doesn't move the needle:</strong> Per-session logistics overhead (schedule change emails, RSVP confirmations, recording distribution). All of this could be systematized.
+      </div>
+    </div>
+
+    <div class="goal-row">
+      <div class="goal-header">
+        <div class="goal-indicator" style="background:var(--red);"></div>
+        <div class="goal-name">Goal 3: L3–L5 designed and in production</div>
+      </div>
+      <div class="goal-body">
+        <strong style="color:var(--text);">Time going toward it:</strong> Essentially none visible in the data. No calendar events, no browser traffic, no email threads on L3+ curriculum design.<br><br>
+        <strong style="color:var(--text);">What should be happening but isn't:</strong> Dedicated design time for L3. Appropriate given L1/L2 delivery priority right now — but reclaiming 3–4 hours/week from student support and onboarding email cleanup would create the space to start.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: AUTOMATION OPPORTUNITIES -->
+  <div class="section">
+    <div class="section-title">Automation Opportunities <span class="tag tag-draft">Draft</span></div>
+
+    <div class="auto-card">
+      <div class="auto-header">
+        <div>
+          <div class="auto-rank">#1 — Highest Impact</div>
+          <div class="auto-outcome">Student support questions answer themselves.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="effort-badge effort-medium">Medium lift</span>
+          <span class="hours-badge">~3h/week reclaimed</span>
+        </div>
+      </div>
+      <div class="auto-grid">
+        <div class="auto-section">
+          <div class="auto-section-label">What's happening today</div>
+          <div class="auto-section-body">The same 5 questions — "Where is the recording?", "Can I switch cohorts?", "I missed a session", "What are the Zoom links?", "How do I access pre-work?" — are being answered manually 5–10 times per week across email and Slack. Each reply takes 2–5 minutes. The answers never change.</div>
+        </div>
+        <div class="auto-section">
+          <div class="auto-section-label">What the automated version looks like</div>
+          <div class="auto-section-body">A Claude-powered FAQ agent watches the AI Builder Slack workspace. When a student asks a known question, it replies instantly with the correct answer and links. For email, a Gmail filter + HubSpot workflow routes FAQ-subject emails to a pre-written response. Edge cases escalate to Slack DM. Kristen removed from first-line triage entirely.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-header">
+        <div>
+          <div class="auto-rank">#2 — High Impact</div>
+          <div class="auto-outcome">Onboarding emails stop confusing students before Session 1.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="effort-badge effort-quick">Quick win</span>
+          <span class="hours-badge">~1.5h/week reclaimed</span>
+        </div>
+      </div>
+      <div class="auto-grid">
+        <div class="auto-section">
+          <div class="auto-section-label">What's happening today</div>
+          <div class="auto-section-body">Students receive 5 overlapping automated emails at enrollment — flagged directly by a student. The confusion drives "what's my schedule?", "which email is correct?", and cohort-switch requests that land in Kristen's inbox. Fixing this is a root-cause fix for a large share of the reactive support load.</div>
+        </div>
+        <div class="auto-section">
+          <div class="auto-section-label">What the automated version looks like</div>
+          <div class="auto-section-body">Audit the HubSpot enrollment workflow with Macy/Ellie. Consolidate 5 emails into: (1) welcome + what to do now, (2) day-before reminder with Zoom link. Each email has exactly one job. Requires a 2h HubSpot session. Output: students arrive informed, cohort-switch requests drop significantly.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-header">
+        <div>
+          <div class="auto-rank">#3 — High Impact</div>
+          <div class="auto-outcome">Cohort switching happens without my involvement.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="effort-badge effort-medium">Medium lift</span>
+          <span class="hours-badge">~1h/week reclaimed</span>
+        </div>
+      </div>
+      <div class="auto-grid">
+        <div class="auto-section">
+          <div class="auto-section-label">What's happening today</div>
+          <div class="auto-section-body">Students who can't attend their enrolled cohort email Kristen to request a switch. She manually reviews, approves, and replies — sometimes 3–4 times to the same student. 5+ instances in the last 2 weeks. Fully delegatable or automatable.</div>
+        </div>
+        <div class="auto-section">
+          <div class="auto-section-label">What the automated version looks like</div>
+          <div class="auto-section-body">A self-serve form (Typeform or Leland-native) lets students select a new cohort date. Submission triggers a HubSpot workflow: updates enrollment, sends confirmation, notifies ops. Kristen gets a weekly Slack digest of all switches — not individual emails. Kristen removed from the loop entirely.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-header">
+        <div>
+          <div class="auto-rank">#4 — Medium Impact</div>
+          <div class="auto-outcome">Recording links reach students automatically within 30 minutes of each session.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="effort-badge effort-medium">Medium lift</span>
+          <span class="hours-badge">~1h/week reclaimed</span>
+        </div>
+      </div>
+      <div class="auto-grid">
+        <div class="auto-section">
+          <div class="auto-section-label">What's happening today</div>
+          <div class="auto-section-body">After each session, Zoom sends a recording-ready email. Someone (often Kristen) manually distributes the link via Slack or email. "Where is the recording?" is the #1 student support question — meaning distribution is delayed or inconsistent enough that students can't find it themselves.</div>
+        </div>
+        <div class="auto-section">
+          <div class="auto-section-label">What the automated version looks like</div>
+          <div class="auto-section-body">An n8n workflow watches for Zoom recording-ready emails (or Zoom webhook). When triggered, it extracts the recording URL and posts to the correct cohort Slack channel with a formatted message. Optionally sends a HubSpot email to enrolled students. Trigger: Zoom recording email. Output: recording in Slack within 30 min of session end. Zero manual steps.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-header">
+        <div>
+          <div class="auto-rank">#5 — Medium Impact</div>
+          <div class="auto-outcome">Weekly update to Nick writes itself in 2 minutes.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="effort-badge effort-quick">Quick win</span>
+          <span class="hours-badge">~0.5h/week reclaimed</span>
+        </div>
+      </div>
+      <div class="auto-grid">
+        <div class="auto-section">
+          <div class="auto-section-label">What's happening today</div>
+          <div class="auto-section-body">A weekly summary email to Nick is drafted manually by pulling from Notion, calendar, and memory. Each draft takes 20–40 minutes. The format is consistent week to week (this week / blockers / next week).</div>
+        </div>
+        <div class="auto-section">
+          <div class="auto-section-label">What the automated version looks like</div>
+          <div class="auto-section-body">A Claude Code skill (or n8n workflow) pulls this week's calendar events, Notion course status, and flagged blockers. Drafts a Nick-style weekly update in Kristen's voice. Review and send in under 2 minutes. Trigger: Thursday 3pm. Output: draft in correct voice, ready to paste into email.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auto-card">
+      <div class="auto-header">
+        <div>
+          <div class="auto-rank">#6 — Longer Term</div>
+          <div class="auto-outcome">LinkedIn presence runs on a publishing schedule without daily browsing.</div>
+        </div>
+        <div class="auto-badges">
+          <span class="effort-badge effort-big">Big build</span>
+          <span class="hours-badge">~2h/week reclaimed</span>
+        </div>
+      </div>
+      <div class="auto-grid">
+        <div class="auto-section">
+          <div class="auto-section-label">What's happening today</div>
+          <div class="auto-section-body">LinkedIn is the #1 most-visited domain (749 visits during work hours) — beating Gmail, Notion, and Claude combined. 68 visits/day on average. No publishing calendar visible in the data. Most of this is habitual checking, not intentional distribution work.</div>
+        </div>
+        <div class="auto-section">
+          <div class="auto-section-label">What the automated version looks like</div>
+          <div class="auto-section-body">A weekly 30-minute batch session with Claude generates 3–5 LinkedIn posts from actual AI Builder work: student wins, session highlights, lessons learned. Posts scheduled for the week via Buffer or native scheduling. LinkedIn becomes publish-and-exit instead of browse-constantly. Target: cut daily visit count from 68 to under 15.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: DATA SOURCES -->
+  <div class="section">
+    <div class="section-title">Data Sources</div>
+    <table class="sources-table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Status</th>
+          <th>Date Range</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mac Screen Time (knowledgeC.db)</td>
+          <td class="source-ok">Connected</td>
+          <td>Apr 6–20, 2026 (11 weekdays)</td>
+          <td>12,988 app usage records; filtered weekdays 8am–6:30pm local time</td>
+        </tr>
+        <tr>
+          <td>Chrome History (Profile 5: kristen@joinleland.com)</td>
+          <td class="source-ok">Connected</td>
+          <td>Apr 6–20, 2026</td>
+          <td>7,085 work-hours visits; 35 domains analyzed; social media flagged at 13.5%</td>
+        </tr>
+        <tr>
+          <td>Google Calendar</td>
+          <td class="source-ok">Connected</td>
+          <td>Apr 1–20, 2026 (14 weekdays)</td>
+          <td>53 back-to-back instances; 8 recurring patterns identified; daily totals affected by UTC coaching session timezone; qualitative patterns used</td>
+        </tr>
+        <tr>
+          <td>Gmail (sent + inbox)</td>
+          <td class="source-ok">Connected</td>
+          <td>Last 30 days</td>
+          <td>50 sent + 50 inbox threads sampled; recurring patterns identified qualitatively</td>
+        </tr>
+        <tr>
+          <td>Slack (AI Builder workspace)</td>
+          <td class="source-ok">Connected</td>
+          <td>Apr 6–20, 2026</td>
+          <td>Sent messages and DM threads in lelandaibuilders.slack.com; 30 new members added Apr 12–18</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    Time Audit — April 20, 2026 &nbsp;|&nbsp; Part of my AI Builder Automation Portfolio
+  </div>
+
+</div>
+</body>
+</html>
